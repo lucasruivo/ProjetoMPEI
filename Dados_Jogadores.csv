@@ -1,4 +1,4 @@
-IP,Inventario,Acuracia,TempoReacao,APM,TaxaHeadshots,JaFoiSuspeito,IPRepetido,SusInv,Classe
+IP,Inventario,Precisao,TempoReacao,APM,TaxaHeadshots,JaFoiSuspeito,IPRepetido,SusInv,Classe
 192.168.59.220,"GranadaFumo, Submetralhadora, Lança-granadas, Mira",69,341,100,95,0,0,0,Suspeito
 192.168.54.31,"GranadaInc, Fuzil, Submetralhadora, Metralhadora",70,363,60,100,0,0,0,Suspeito
 192.168.180.67,"Explosivo, Submetralhadora, Espingarda, Capacete",77,327,72,58,0,0,1,Suspeito
