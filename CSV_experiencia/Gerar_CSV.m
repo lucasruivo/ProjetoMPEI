@@ -6,29 +6,27 @@ accuracy_limit = 80;
 reaction_limit = 200;
 apm_low = 40;
 apm_high = 100;
-headshot_limit = 50; % Limite para taxa de headshots considerada estranha (%)
+headshot_limit = 70; % Limite para taxa de headshots considerada estranha (%)
 
 % Pesos das métricas
 pesos = struct(...
     'IPRepetido', 2.0, ...
     'JaFoiSuspeito', 2.0, ...
     'Acuracia', 1.5, ...
-    'TempoReacao', 1.0, ...
+    'TempoReacao', 1.5, ...
     'APM', 1.0, ...
     'TaxaHeadshots', 1.5, ...
-    'AcoesBots', 1.0);
+    'AcoesBots', 1.5);
 
 % Gerar dados contínuos
 rng('shuffle'); % Para reprodutibilidade variável
 IPs = arrayfun(@(x) sprintf('192.168.%d.%d', randi(255), randi(255)), 1:numJogadores, 'UniformOutput', false);
-Acuracia = randi([50, 100], numJogadores, 1);
+Acuracia = randi([40, 100], numJogadores, 1);
 TempoReacao = randi([50, 400], numJogadores, 1);
-APM = randi([30, 150], numJogadores, 1);
+APM = randi([20, 150], numJogadores, 1);
 TaxaHeadshots = randi([0, 100], numJogadores, 1);
-IPRepetido = randi([0, 1], numJogadores, 1); % Binário gerado aleatoriamente
-AcoesBots = randi([0, 1], numJogadores, 1);
 
-% Gerar lista de IPs reportados (5% dos jogadores, por exemplo)
+% Gerar lista de IPs reportados (5% dos jogadores)
 percent_reportados = 0.05;
 numReportados = floor(numJogadores * percent_reportados);
 IPsReportados = IPs(randperm(numJogadores, numReportados));
@@ -52,34 +50,63 @@ for i = 1:numJogadores
     Inventarios{i} = strjoin(itens, ', ');
 end
 
-% Calcular score ponderado e definir classes
+% Criar tabela inicial
+Tabela = table(IPs', Inventarios, Acuracia, TempoReacao, APM, TaxaHeadshots, ...
+    JaFoiSuspeito, 'VariableNames', {'IP', 'Inventario', 'Acuracia', 'TempoReacao', ...
+                                     'APM', 'TaxaHeadshots', 'JaFoiSuspeito'});
+
+% Ajustar valores de IPRepetido
+Tabela.IPRepetido = zeros(numJogadores, 1);
+for i = 1:height(Tabela)
+    ipAtual = Tabela.IP{i};
+    if sum(strcmp(Tabela.IP(1:i-1), ipAtual)) > 0
+        Tabela.IPRepetido(i) = 1;
+    end
+end
+
+% Configurar inventários suspeitos
+inventariosBots = {
+    {'Sniper', 'Silenciador', 'Mira', 'Colete'},
+    {'Drone', 'Explosivo', 'Espingarda', 'Capacete'},
+    {'Submetralhadora', 'Faca', 'GranadaFumo', 'Silenciador'},
+    {'Pistola', 'Torreta', 'Colete', 'Capacete'},
+    {'Espingarda', 'Silenciador', 'GranadaFumo', 'Colete'}
+};
+
+% Ajustar valores de SusInv
+Tabela.SusInv = zeros(numJogadores, 1);
+for i = 1:height(Tabela)
+    inventarioJogador = strsplit(Tabela.Inventario{i}, ', ');
+    for j = 1:length(inventariosBots)
+        if sum(ismember(inventarioJogador, inventariosBots{j})) >= 3
+            Tabela.SusInv(i) = 1;
+            break;
+        end
+    end
+end
+
+% Calcular a classe com base nas colunas ajustadas
 Classes = strings(numJogadores, 1);
 for i = 1:numJogadores
     score = 0;
-    score = score + pesos.IPRepetido * IPRepetido(i);
-    score = score + pesos.JaFoiSuspeito * JaFoiSuspeito(i);
-    score = score + pesos.Acuracia * (Acuracia(i) < accuracy_limit);
-    score = score + pesos.TempoReacao * (TempoReacao(i) > reaction_limit);
-    score = score + pesos.APM * ((APM(i) < apm_low) + (APM(i) > apm_high));
-    score = score + pesos.TaxaHeadshots * (TaxaHeadshots(i) > headshot_limit);
-    score = score + pesos.AcoesBots * AcoesBots(i);
+    score = score + pesos.IPRepetido * Tabela.IPRepetido(i);
+    score = score + pesos.JaFoiSuspeito * Tabela.JaFoiSuspeito(i);
+    score = score + pesos.Acuracia * (Tabela.Acuracia(i) < accuracy_limit);
+    score = score + pesos.TempoReacao * (Tabela.TempoReacao(i) > reaction_limit);
+    score = score + pesos.APM * ((Tabela.APM(i) < apm_low) + (Tabela.APM(i) > apm_high));
+    score = score + pesos.TaxaHeadshots * (Tabela.TaxaHeadshots(i) > headshot_limit);
+    score = score + pesos.AcoesBots * Tabela.SusInv(i);
 
-    if score > 4.5
+    if score > 3.5
         Classes(i) = "Suspeito";
     else
         Classes(i) = "Legítimo";
     end
 end
 
-% Criar tabela final
-Tabela = table(IPs', Inventarios, Acuracia, TempoReacao, APM, TaxaHeadshots, IPRepetido, ...
-    JaFoiSuspeito, AcoesBots, Classes, ...
-    'VariableNames', {'IP', 'Inventario', 'Acuracia', 'TempoReacao', 'APM', ...
-                      'TaxaHeadshots', 'IPRepetido', 'JaFoiSuspeito', ...
-                      'SusInv', 'Classe'});
+% Adicionar classes à tabela
+Tabela.Classe = Classes;
 
-% Salvar em CSV
+% Salvar tabela em CSV
 writetable(Tabela, 'Experiencia.csv');
-disp('Tabela gerada e salva como "Tabela_Dados_Jogadores_Sem_BloomFilter.csv".');
-
-disp(IPsReportados);
+disp('Tabela gerada e salva como "Experiencia.csv".');
