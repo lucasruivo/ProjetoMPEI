@@ -42,7 +42,7 @@ itens_inventario = { ...
     'Pistola', 'Revólver', 'Fuzil', 'Espingarda', 'Sniper', ...
     'GranadaFrag', 'Submetralhadora', 'Metralhadora', 'Faca', 'Silenciador', ...
     'Mira', 'Drone', 'Explosivo', 'Torreta', 'Capacete', ...
-    'Colete', 'GranadaInc', 'MediKit', 'Lança-granadas', 'GranadaFumo' ...
+    'Colete', 'GranadaInc', 'MedKit', 'Lança-granadas', 'GranadaFumo' ...
 };
 Inventarios = cell(numJogadores, 1);
 for i = 1:numJogadores
@@ -91,8 +91,8 @@ for i = 1:numJogadores
     score = 0;
     score = score + pesos.IPRepetido * Tabela.IPRepetido(i);
     score = score + pesos.JaFoiSuspeito * Tabela.JaFoiSuspeito(i);
-    score = score + pesos.Acuracia * (Tabela.Acuracia(i) < accuracy_limit);
-    score = score + pesos.TempoReacao * (Tabela.TempoReacao(i) > reaction_limit);
+    score = score + pesos.Acuracia * (Tabela.Acuracia(i) > accuracy_limit);
+    score = score + pesos.TempoReacao * (Tabela.TempoReacao(i) < reaction_limit);
     score = score + pesos.APM * ((Tabela.APM(i) < apm_low) + (Tabela.APM(i) > apm_high));
     score = score + pesos.TaxaHeadshots * (Tabela.TaxaHeadshots(i) > headshot_limit);
     score = score + pesos.AcoesBots * Tabela.SusInv(i);
