@@ -10,7 +10,6 @@ headshot_limit = 70; % Limite para taxa de headshots considerada estranha (%)
 
 % Pesos das métricas
 pesos = struct(...
-    'IPRepetido', 2.0, ...
     'JaFoiSuspeito', 2.0, ...
     'Acuracia', 1.5, ...
     'TempoReacao', 1.5, ...
@@ -26,16 +25,8 @@ TempoReacao = randi([50, 400], numJogadores, 1);
 APM = randi([20, 150], numJogadores, 1);
 TaxaHeadshots = randi([0, 100], numJogadores, 1);
 
-% Gerar lista de IPs reportados (5% dos jogadores)
-percent_reportados = 0.05;
-numReportados = floor(numJogadores * percent_reportados);
-IPsReportados = IPs(randperm(numJogadores, numReportados));
-
-% Verificar se cada IP já foi reportado diretamente na lista
-JaFoiSuspeito = false(numJogadores, 1);
-for i = 1:numJogadores
-    JaFoiSuspeito(i) = ismember(IPs{i}, IPsReportados);
-end
+% Gerar valores aleatórios para JaFoiSuspeito
+JaFoiSuspeito = randi([0, 1], numJogadores, 1); % Valores binários aleatórios
 
 % Gerar inventário aleatório para cada jogador
 itens_inventario = { ...
@@ -52,17 +43,8 @@ end
 
 % Criar tabela inicial
 Tabela = table(IPs', Inventarios, Acuracia, TempoReacao, APM, TaxaHeadshots, ...
-    JaFoiSuspeito, 'VariableNames', {'IP', 'Inventario', 'Acuracia', 'TempoReacao', ...
+    JaFoiSuspeito, 'VariableNames', {'IP', 'Inventario', 'Precisao', 'TempoReacao', ...
                                      'APM', 'TaxaHeadshots', 'JaFoiSuspeito'});
-
-% Ajustar valores de IPRepetido
-Tabela.IPRepetido = zeros(numJogadores, 1);
-for i = 1:height(Tabela)
-    ipAtual = Tabela.IP{i};
-    if sum(strcmp(Tabela.IP(1:i-1), ipAtual)) > 0
-        Tabela.IPRepetido(i) = 1;
-    end
-end
 
 % Configurar inventários suspeitos
 inventariosBots = {
@@ -89,9 +71,8 @@ end
 Classes = strings(numJogadores, 1);
 for i = 1:numJogadores
     score = 0;
-    score = score + pesos.IPRepetido * Tabela.IPRepetido(i);
     score = score + pesos.JaFoiSuspeito * Tabela.JaFoiSuspeito(i);
-    score = score + pesos.Acuracia * (Tabela.Acuracia(i) > accuracy_limit);
+    score = score + pesos.Acuracia * (Tabela.Precisao(i) > accuracy_limit);
     score = score + pesos.TempoReacao * (Tabela.TempoReacao(i) < reaction_limit);
     score = score + pesos.APM * ((Tabela.APM(i) < apm_low) + (Tabela.APM(i) > apm_high));
     score = score + pesos.TaxaHeadshots * (Tabela.TaxaHeadshots(i) > headshot_limit);
