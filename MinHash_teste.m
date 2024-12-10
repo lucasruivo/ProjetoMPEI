@@ -1,4 +1,4 @@
-
+clear;
 ficheiro = 'Dados_Jogadores.csv';
 [Set,Nj,jogadores] = criar_sets(ficheiro);
 k=200;
