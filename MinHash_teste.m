@@ -1,18 +1,32 @@
 clear;
-ficheiro = 'Dados_Jogadores.csv';
-[Set,Nj,jogadores] = criar_sets(ficheiro);
+ficheiro = 'InventariosBots.txt';
+ksh=3;
+[Set,Nb,InvBots] = criar_sets(ficheiro,ksh);
 k=200;
-%%
-R.a = randi(123457,1,k);
-R.b = randi(123457,1,k);
-R.p = 123453;
-while ~ isprime(R.p)
-    R.p = R.p+2;
+
+p = 123456781;
+
+while ~isprime(p)
+    p=p+2;
 end
+R = randi(p,k,ksh);
+MA= Calcular_Assinaturas_Inv(Set,Nb,k,R,p);
 
-J = distanciasMinHash(Set,Nj,k,R);
+%% TESTE
+
+test = {'Metralhadora', 'Faca', 'Drone', 'Colete'};
+
+
+%fazer shingles
+[Set2] = criar_sets_uma_string(test,ksh);
+
+%calcular assinaturas
+MA2 = Calcular_Assinaturas_Inv(Set2,1,k,R,p);
+%calcular distancias
+
+J = distanciasMinHash(MA,MA2,Nb,1,k);
 
 %%
-threshold = 0.01;
-SimilarUsers = paresSimilares(J,Nj,jogadores,threshold);
+threshold = 0.4;
+SimilarUsers = paresSimilares(J,Nb,1,InvBots,test,threshold);
 

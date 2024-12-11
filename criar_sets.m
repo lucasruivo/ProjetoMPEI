@@ -1,18 +1,22 @@
-function [Set,Nj,jogadores] = criar_sets(ficheiro)
-
+function [Set,Nb,InvBots] = criar_sets(ficheiro,ksh)
 % Código base para deteção de pares similares
-data = readtable(ficheiro); % Carrega o ficheiro dos dados dos jogadores
-% Mantém apenas as duas primeiras colunas (jogador, inventário)
-d = data(:, 1:2); 
 
-% Lista de jogadores
-jogadores = d(:, 1); % Extrai os IPs dos jogadores
-Nj = height(jogadores); % Número total de jogadores
+InvBots_Raw = readcell(ficheiro,'Delimiter',', ');
 
-% Constrói a lista de itens de cada jogador
-Set = cell(Nj, 1); % Usa células para armazenar os conjuntos de items
-for n = 1:Nj
-    Set{n} = strsplit(d.Inventario{n}, ', ');
+Nb = length(InvBots_Raw); 
+InvBots = cell(Nb, 1);
+Set = cell(Nb, 1); 
+
+for n = 1:Nb
+    InvBots{n} = InvBots_Raw(n, :);
+    inventario = strjoin(InvBots_Raw(n, :), '');
+    
+% Criar shingles a partir da string combinada
+    nsh = strlength(inventario) - ksh + 1;
+    shingles = cell(1, nsh);
+    for sh = 1:nsh
+        shingles{sh} = inventario(sh:sh + ksh - 1);
+    end
+    Set{n} = shingles;
 end
-
 end

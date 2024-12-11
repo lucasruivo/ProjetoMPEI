@@ -25,8 +25,16 @@ TempoReacao = randi([50, 400], numJogadores, 1);
 APM = randi([20, 150], numJogadores, 1);
 TaxaHeadshots = randi([0, 100], numJogadores, 1);
 
-% Gerar valores aleatórios para JaFoiSuspeito
-JaFoiSuspeito = randi([0, 1], numJogadores, 1); % Valores binários aleatórios
+% Gerar lista de IPs reportados (5% dos jogadores)
+percent_reportados = 0.05;
+numReportados = floor(numJogadores * percent_reportados);
+IPsReportados = IPs(randperm(numJogadores, numReportados));
+
+% Verificar se cada IP já foi reportado diretamente na lista
+JaFoiSuspeito = false(numJogadores, 1);
+for i = 1:numJogadores
+    JaFoiSuspeito(i) = ismember(IPs{i}, IPsReportados);
+end
 
 % Gerar inventário aleatório para cada jogador
 itens_inventario = { ...
@@ -41,31 +49,13 @@ for i = 1:numJogadores
     Inventarios{i} = strjoin(itens, ', ');
 end
 
+% Gerar valores aleatórios para SusInv
+SusInv = randi([0, 1], numJogadores, 1);
+
 % Criar tabela inicial
 Tabela = table(IPs', Inventarios, Acuracia, TempoReacao, APM, TaxaHeadshots, ...
-    JaFoiSuspeito, 'VariableNames', {'IP', 'Inventario', 'Precisao', 'TempoReacao', ...
-                                     'APM', 'TaxaHeadshots', 'JaFoiSuspeito'});
-
-% Configurar inventários suspeitos
-inventariosBots = {
-    {'Sniper', 'Silenciador', 'Mira', 'Colete'},
-    {'Drone', 'Explosivo', 'Espingarda', 'Capacete'},
-    {'Submetralhadora', 'Faca', 'GranadaFumo', 'Silenciador'},
-    {'Pistola', 'Torreta', 'Colete', 'Capacete'},
-    {'Espingarda', 'Silenciador', 'GranadaFumo', 'Colete'}
-};
-
-% Ajustar valores de SusInv
-Tabela.SusInv = zeros(numJogadores, 1);
-for i = 1:height(Tabela)
-    inventarioJogador = strsplit(Tabela.Inventario{i}, ', ');
-    for j = 1:length(inventariosBots)
-        if sum(ismember(inventarioJogador, inventariosBots{j})) >= 3
-            Tabela.SusInv(i) = 1;
-            break;
-        end
-    end
-end
+    JaFoiSuspeito, SusInv, 'VariableNames', {'IP', 'Inventario', 'Precisao', 'TempoReacao', ...
+                                     'APM', 'TaxaHeadshots', 'JaFoiSuspeito', 'SusInv'});
 
 % Calcular a classe com base nas colunas ajustadas
 Classes = strings(numJogadores, 1);
@@ -89,5 +79,23 @@ end
 Tabela.Classe = Classes;
 
 % Salvar tabela em CSV
-writetable(Tabela, 'Experiencia.csv');
-disp('Tabela gerada e salva como "Experiencia.csv".');
+writetable(Tabela, 'Experiencia.txt');
+disp('Tabela gerada e salva como "Experiencia.txt".');
+
+% Criar 2000 inventários diferentes para Bots
+numBots = 2000;
+InventariosBots = cell(numBots, 1);
+uniqueCombinations = nchoosek(itens_inventario, 4); % Gerar todas as combinações de 4 itens
+idx = randperm(size(uniqueCombinations, 1), numBots); % Selecionar combinações aleatórias
+
+for i = 1:numBots
+    InventariosBots{i} = strjoin(uniqueCombinations(idx(i), :), ', ');
+end
+
+% Salvar InventariosBots em um arquivo txt
+fileID = fopen('InventariosBots.txt', 'w');
+for i = 1:numBots
+    fprintf(fileID, '%s\n', InventariosBots{i});
+end
+fclose(fileID);
+disp('Inventários Bots gerados e salvos como "InventariosBots.txt".');
