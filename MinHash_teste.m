@@ -14,7 +14,7 @@ MA= Calcular_Assinaturas_Inv(Set,Nb,k,R,p);
 
 %% TESTE
 
-test = {'Metralhadora', 'Faca', 'Drone', 'Colete'};
+test = {'Metralhadora', 'Faca', 'Drone', 'GranadaGas'};
 
 
 %fazer shingles
@@ -26,7 +26,7 @@ MA2 = Calcular_Assinaturas_Inv(Set2,1,k,R,p);
 
 J = distanciasMinHash(MA,MA2,Nb,1,k);
 
-%%
-threshold = 0.4;
+%%4
+threshold = 0.35;
 SimilarUsers = paresSimilares(J,Nb,1,InvBots,test,threshold);
 
