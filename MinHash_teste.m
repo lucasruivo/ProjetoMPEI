@@ -14,7 +14,7 @@ MA= Calcular_Assinaturas_Inv(Set,Nb,k,R,p);
 
 %% TESTE
 
-test = {'Metralhadora', 'Faca', 'Drone', 'GranadaGas'};
+test = {'GranadaGas', 'GranadaFumo', 'GranadaFrag', 'GranadaInc'};
 
 
 %fazer shingles
