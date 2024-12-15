@@ -1,8 +1,8 @@
 function SimilarUsers = paresSimilares(J,Nb,Nj,InvBots,inventario,threshold)
 
 % Determina pares com distância inferior a um limiar
-%threshold = 0.3; % Limiar de decisão
-% Array para guardar pares similares (utilizador1, utilizador2, distância)
+%threshold = 0.35; % Limiar de decisão
+
 SimilarUsers = [];
 for b = 1:Nb
     for j = 1:Nj
@@ -12,8 +12,5 @@ for b = 1:Nb
     end
 end
 
-% Exibe os pares de utilizadores similares
-disp('Pares de utilizadores similares:');
-disp(SimilarUsers);
 
 end
