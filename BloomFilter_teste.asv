@@ -28,10 +28,9 @@ end
 %teste='192.168.124.246';
 %r= verificarElemento(teste,BF,k,R)
  
-%% TESTES DE PRECISÃO(dados para o relatório)
-%% Este código foi feito pelo chatgpt e tem de ser refeito
-
-% testes para falsos positivos
+%% TEST
+% Este código foi feito pelo chatgpt e tem de ser refeito
+% Testes para verificar a taxa de falsos positivos
 num_tests = 1000; % Número de testes com IPs aleatórios
 false_positives = 0;
 tested_elements = strings(num_tests, 1);
@@ -44,10 +43,24 @@ for i = 1:num_tests
     end
 end
 
-
+% Resultados
 false_positive_rate = false_positives / num_tests;
 bf_occupation = sum(BF) / n;
 
 fprintf('Taxa de falsos positivos: %.2f%%\n', false_positive_rate * 100);
 fprintf('Ocupação do Bloom Filter: %.2f%%\n', bf_occupation * 100);
 
+% Visualização do Bloom Filter
+rows = 10; % Número de linhas para organizar o vetor em forma de matriz
+cols = ceil(n / rows);
+BF_matrix = reshape([BF, zeros(1, rows * cols - n)], rows, cols);
+
+figure;
+imagesc(BF_matrix); % Exibe o Bloom Filter como imagem
+colormap([1 1 1; 0 0 1]); % Branco para 0, Azul para 1
+colorbar('Ticks', [0, 1], 'TickLabels', {'0', '1'});
+title('Visualização do Bloom Filter');
+xlabel('Colunas');
+ylabel('Linhas');
+axis equal tight;
+grid on;

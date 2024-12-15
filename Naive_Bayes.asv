@@ -14,8 +14,8 @@ binaryFeatures = [5, 6];
 Ncf = length(continuousFeatures);
 Nbf = length(binaryFeatures);
 
-%% Dividir TREINO/TESTE 80/20
-percentTreino = 0.8;
+%% Dividir em treino (70%) e teste (30%) de forma aleatória
+percentTreino = 0.7;
 numTreino = round(percentTreino * size(dados, 1));
 indices = randperm(size(dados, 1));
 
@@ -101,21 +101,21 @@ for j = 1:size(TESTE,1)
         Y_pred(j) = 'Suspeito';
     end
 end
-
 %% TESTES DE PRECISÃO, RECALL E F1-SCORE(dados pro relatório)
+% Matriz de Confusão
+confusionMat = confusionmat(classes_teste, Y_pred);
 
-Matriz_conf = confusionmat(classes_teste, Y_pred);
+TP = confusionMat(2, 2); % True Positives
+FP = confusionMat(1, 2); % False Positives
+FN = confusionMat(2, 1); % False Negatives
+TN = confusionMat(1, 1); % True Negatives
 
-TP = Matriz_conf(2, 2); 
-FP = Matriz_conf(1, 2); 
-FN = Matriz_conf(2, 1); 
-TN = Matriz_conf(1, 1); 
-
+% Métricas
 precisao = TP / (TP + FP);
 recall = TP / (TP + FN);
-f1_score = 2 * precisao * recall / (precisao + recall);
+f1_score = 2 * (precisao * recall) / (precisao + recall);
 
-fprintf('Precisão: %.2f%%\n', precisao * 100);
+fprintf('Precisão: \n', precisao * 100);
 fprintf('Recall: %.2f%%\n', recall * 100);
 fprintf('F1-Score: %.2f%%\n', f1_score * 100);
 
