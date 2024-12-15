@@ -1,4 +1,4 @@
-function [Set2] = criar_sets_uma_string(inventario,ksh)
+function [Set2] = criar_sets_um_inv(inventario,ksh)
 
 
 Set2 = cell(1, 1);

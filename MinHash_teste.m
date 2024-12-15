@@ -18,7 +18,7 @@ test = {'GranadaInc', 'Pistola', 'Metralhadora', 'Colete'};
 
 
 %fazer shingles
-[Set2] = criar_sets_uma_string(test,ksh);
+[Set2] = criar_sets_um_inv(test,ksh);
 
 %calcular assinaturas
 MA2 = Calcular_Assinaturas_Inv(Set2,1,k,R,p);

@@ -25,8 +25,8 @@ for nj = 1:length(jogadores)
 end
 %%
 
-%teste='192.168.124.246';
-%r= verificarElemento(teste,BF,k,R)
+teste='192.168.200.30';
+r= verificarElemento(teste,BF,k,R)
  
 %% TESTES DE PRECISÃO(dados para o relatório)
 %% Este código foi feito pelo chatgpt e tem de ser refeito
