@@ -83,7 +83,7 @@ for i = 1:NJogadores
     apm = input('\nAPM (ações por minuto): ');
     taxaHeadshots = input('\nTaxa de Headshots: ');
 
-    NovosJogadores = [NovosJogadores; {ip, inventario, precisao, tempoReacao, apm, taxaHeadshots, JaFoiSuspeito, susInv}];
+    NovosJogadores = [NovosJogadores; {ip, inventario, precisao, tempoReacao, apm, taxaHeadshots, double(JaFoiSuspeito), susInv}];
 end
 
 %% NAIVE BAYES
@@ -97,19 +97,11 @@ binaryFeatures = [5, 6];
 Ncf = length(continuousFeatures);
 Nbf = length(binaryFeatures);
 
-%%Dividir TREINO/TESTE 80/20
-percentTreino = 0.8;
-numTreino = round(percentTreino * size(dados, 1));
-indices = randperm(size(dados, 1));
-
-indicesTreino = indices(1:numTreino);
-indicesTeste = indices(numTreino + 1:end);
-
-TREINO = dados(indicesTreino, :);
-TESTE = dados(indicesTeste, :);
-classes_treino = classes(indicesTreino);
-classes_teste = classes(indicesTeste);
-
+classes_treino = categorical(M(2:end, end))'; 
+X = M(2:end, 3:end-1); 
+TREINO = cell2mat(X);
+Dados = NovosJogadores(:,3:end);
+TESTE = cell2mat(Dados);
 
 %%Calcular probabilidades
 
@@ -147,7 +139,7 @@ for i = 1:Ncf
 end
 
 %%Classificar os dados de teste
-Y_pred = categorical(repmat({'Legítimo'}, size(classes_teste))); % Inicializar como 'Legítimo'
+Y_pred = categorical(repmat({'Legítimo'}, NJogadores)); % Inicializar como 'Legítimo'
 
 %para dados binários
 for j = 1:size(TESTE,1)
@@ -183,4 +175,8 @@ for j = 1:size(TESTE,1)
     else
         Y_pred(j) = 'Suspeito';
     end
+end
+
+for j=1:NJogadores
+    fprintf('\nO Jogador %d é %s\n', j ,Y_pred(j));
 end
