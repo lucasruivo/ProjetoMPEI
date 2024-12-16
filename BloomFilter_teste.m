@@ -25,29 +25,27 @@ for nj = 1:length(jogadores)
 end
 %%
 
-teste='192.168.200.30';
-r= verificarElemento(teste,BF,k,R)
+%teste='192.168.200.30';
+%r= verificarElemento(teste,BF,k,R)
  
-%% TESTES DE PRECISÃO(dados para o relatório)
-%% Este código foi feito pelo chatgpt e tem de ser refeito
+%% TESTES DE FALSOS POSITIVOS(dados para o relatório)
 
-% testes para falsos positivos
-num_tests = 1000; % Número de testes com IPs aleatórios
-false_positives = 0;
-tested_elements = strings(num_tests, 1);
+ntests = 1000;
+falsos_positivos = 0;
+testados = strings(ntests, 1);
 
-for i = 1:num_tests
+for i = 1:ntests
     teste = sprintf('192.168.%d.%d', randi([0, 255]), randi([0, 255]));
-    tested_elements(i) = teste;
+    testados(i) = teste;
     if verificarElemento(teste, BF, k, R) && ~any(jogadores == teste)
-        false_positives = false_positives + 1;
+        falsos_positivos = falsos_positivos + 1;
     end
 end
 
 
-false_positive_rate = false_positives / num_tests;
-bf_occupation = sum(BF) / n;
+percentFalsosPositivos = falsos_positivos / ntests * 100;
+OcupacaoBF = sum(BF) / n * 100;
 
-fprintf('Taxa de falsos positivos: %.2f%%\n', false_positive_rate * 100);
-fprintf('Ocupação do Bloom Filter: %.2f%%\n', bf_occupation * 100);
+fprintf('Taxa de falsos positivos: %.2f%%\n', percentFalsosPositivos);
+fprintf('Ocupação do Bloom Filter: %.2f%%\n', OcupacaoBF);
 

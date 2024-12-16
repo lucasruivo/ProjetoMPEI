@@ -71,9 +71,9 @@ for i = 1:NJogadores
         dist=min(distancias);
         indiceBot=find(distancias==dist,1);
         fprintf('O Jogador %d tem um inventário muito similar a um Bot: \n', i);
-        fprintf('Jogador %d: %s %s %s %s\n', i,SimilarUsers{indiceBot,1:4});
-        fprintf('Bot: %s %s %s %s\n', SimilarUsers{indiceBot,5:8});
-        fprintf('Distância: %d \n', dist);
+        fprintf('Jogador %d: %s %s %s %s\n', i,SimilarUsers{indiceBot,5:8});
+        fprintf('Bot: %s %s %s %s\n', SimilarUsers{indiceBot,1:4});
+        fprintf('Distância: %.3f \n', dist);
     else
         susInv = 0;
     end
