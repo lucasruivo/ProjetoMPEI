@@ -29,10 +29,3 @@ J = distanciasMinHash(MA,MA2,Nb,1,k);
 %%
 threshold = 0.35;
 SimilarUsers = paresSimilares(J,Nb,1,InvBots,test,threshold);
-
-figure;
-histogram(J(:, 1), 20, 'FaceColor', 'blue', 'EdgeColor', 'black');
-title('Distribuição das Distâncias MinHash');
-xlabel('Distância');
-ylabel('Frequência');
-grid on;
