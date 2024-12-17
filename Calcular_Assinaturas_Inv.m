@@ -1,6 +1,7 @@
 function Assinaturas = Calcular_Assinaturas_Inv(Set, Nb, k, R, p)
     % Inicializa matriz de assinaturas
     Assinaturas = zeros(k, Nb);
+
     for hf = 1:k
         for c = 1:Nb
             conjunto = Set{c};

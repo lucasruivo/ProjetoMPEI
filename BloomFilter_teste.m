@@ -52,4 +52,4 @@ fprintf('Ocupação do Bloom Filter: %.2f%%\n', OcupacaoBF);
 
 
 
-%% VER O ~ANY(ISTO), VER A WAITBAR, FAZER AS VERIFICAÇÕES
+%% VER O ~ANY(ISTO), FAZER AS VERIFICAÇÕES

@@ -21,12 +21,15 @@ while ~isprime(R.p)
     R.p = R.p + 2;
 end
 
+h1 = waitbar(0, 'Inicializando Bloom Filter...');
 for nj = 1:length(jogadores)
+    waitbar(nj / length(jogadores), h1);
     j = jogadores(nj);
     if classes(nj) == 'Suspeito'
         BF = adicionarElemento(j, BF, kb, R);
     end
 end
+close(h1);
 fprintf('Bloom Filter inicializado com %d bits.\n', n);
 
 %% MINHASH
@@ -36,12 +39,13 @@ ksh = 3;
 km = 500;
 
 p = 123456781;
-
 while ~isprime(p)
     p = p + 2;
 end
 Rm = randi(p, km, ksh);
+
 MA = Calcular_Assinaturas_Inv(Set, Nb, km, Rm, p);
+
 fprintf('MinHash calculado com %d funções de hash.\n', km);
 
 %% INPUT DE DADOS E VERIFICAÇÃO BLOOMFILTER/MINHASH
@@ -57,9 +61,9 @@ for i = 1:NJogadores
     if JaFoiSuspeito == 1
         fprintf('ALERTA: O Jogador %d (%s) já foi suspeito!\n', i, ip);
     end
-
+    
     inventario = strsplit(input('\nInventário (ex: GranadaInc Pistola Metralhadora Colete): ', 's'), ' ');
-
+    
     % Fazer shingles
     [Set2] = criar_sets_um_inv(inventario, ksh);
     
@@ -78,7 +82,7 @@ for i = 1:NJogadores
         indiceBot = find(distancias == dist, 1);
         fprintf('Inventário similar encontrado para Jogador %d:\n', i);
         fprintf('  Inventário do Jogador: %s || %s || %s || %s\n', SimilarUsers{indiceBot, 5:8});
-        fprintf('  Inventário do Bot mais próximo: %s || %s || %s || %s\n', SimilarUsers{indiceBot, 1:4});
+        fprintf('  Inventário do Bot: %s || %s || %s || %s\n', SimilarUsers{indiceBot, 1:4});
         fprintf('  Distância: %.3f\n', dist);
     else
         susInv = 0;
@@ -96,58 +100,50 @@ end
 fprintf('\n--- Classificação com Naive Bayes ---\n');
 
 classes = categorical(M(2:end, end))'; 
-X = M(2:end, 3:end-1); 
-dados = cell2mat(X);
+TREINO = cell2mat(M(2:end, 3:end-1));
+Dados = NovosJogadores(:, 3:end);
+TESTE = cell2mat(Dados);
 
 continuousFeatures = [1 2 3 4];
 binaryFeatures = [5, 6]; 
 Ncf = length(continuousFeatures);
 Nbf = length(binaryFeatures);
 
-classes_treino = categorical(M(2:end, end))'; 
-TREINO = cell2mat(M(2:end, 3:end-1));
-Dados = NovosJogadores(:, 3:end);
-TESTE = cell2mat(Dados);
+numLeg = sum(classes == 'Legítimo');
+numSus = sum(classes == 'Suspeito');
+pLeg = numLeg / length(classes);
+pSus = numSus / length(classes);
 
-% Cálculo das probabilidades
-numLeg = sum(classes_treino == 'Legítimo');
-numSus = sum(classes_treino == 'Suspeito');
-pLeg = numLeg / length(classes_treino);
-pSus = numSus / length(classes_treino);
-
-% Condicionais para dados binários
+% condicionais para dados binários
 pFeatureGivenLeg = zeros(1, Nbf);
 pFeatureGivenSus = zeros(1, Nbf);
 for i = 1:Nbf
     indiceBinary = binaryFeatures(i);
-    pFeatureGivenLeg(i) = sum(TREINO(classes_treino == 'Legítimo', indiceBinary)) / numLeg;
-    pFeatureGivenSus(i) = sum(TREINO(classes_treino == 'Suspeito', indiceBinary)) / numSus;
+    pFeatureGivenLeg(i) = sum(TREINO(classes == 'Legítimo', indiceBinary)) / numLeg;
+    pFeatureGivenSus(i) = sum(TREINO(classes == 'Suspeito', indiceBinary)) / numSus;
 end
 
-% Condicionais para dados contínuos
+% condicionais para dados contínuos
 mediaLeg = zeros(1, Ncf);
 mediaSus = zeros(1, Ncf);
 desvioLeg = zeros(1, Ncf);
 desvioSus = zeros(1, Ncf);
-
 for i = 1:Ncf
     indiceContinuous = continuousFeatures(i);
-    mediaLeg(i) = mean(TREINO(classes_treino == 'Legítimo', indiceContinuous));
-    mediaSus(i) = mean(TREINO(classes_treino == 'Suspeito', indiceContinuous));
-    desvioLeg(i) = std(TREINO(classes_treino == 'Legítimo', indiceContinuous));
-    desvioSus(i) = std(TREINO(classes_treino == 'Suspeito', indiceContinuous));
+    mediaLeg(i) = mean(TREINO(classes == 'Legítimo', indiceContinuous));
+    mediaSus(i) = mean(TREINO(classes == 'Suspeito', indiceContinuous));
+    desvioLeg(i) = std(TREINO(classes == 'Legítimo', indiceContinuous));
+    desvioSus(i) = std(TREINO(classes == 'Suspeito', indiceContinuous));
 end
 
-% Classificação
 Y_pred = categorical(repmat({'Legítimo'}, NJogadores));
+h4 = waitbar(0, 'Classificando jogadores...');
 for j = 1:size(TESTE, 1)
+    waitbar(j / size(TESTE, 1), h4);
     pinicialLeg = pLeg;
     pinicialSus = pSus;
-
-    % Dados binários
     for k = 1:Nbf
-        indiceBinary = binaryFeatures(k);
-        if TESTE(j, indiceBinary) == 1
+        if TESTE(j, binaryFeatures(k)) == 1
             pinicialLeg = pinicialLeg * pFeatureGivenLeg(k);
             pinicialSus = pinicialSus * pFeatureGivenSus(k);
         else
@@ -155,28 +151,17 @@ for j = 1:size(TESTE, 1)
             pinicialSus = pinicialSus * (1 - pFeatureGivenSus(k));
         end
     end
-
-    % Dados contínuos
     for k = 1:Ncf
-        indiceContinuous = continuousFeatures(k);
-        valor = TESTE(j, indiceContinuous);
-
-        % Densidade gaussiana
-        pGaussianaLeg = (1 / (sqrt(2 * pi) * desvioLeg(k))) * exp(-0.5 * ((valor - mediaLeg(k)) / desvioLeg(k))^2);
-        pGaussianaSus = (1 / (sqrt(2 * pi) * desvioSus(k))) * exp(-0.5 * ((valor - mediaSus(k)) / desvioSus(k))^2);
-        pinicialLeg = pinicialLeg * pGaussianaLeg;
-        pinicialSus = pinicialSus * pGaussianaSus;
+        valor = TESTE(j, continuousFeatures(k));
+        pLegG = (1 / (sqrt(2 * pi) * desvioLeg(k))) * exp(-0.5 * ((valor - mediaLeg(k)) / desvioLeg(k))^2);
+        pSusG = (1 / (sqrt(2 * pi) * desvioSus(k))) * exp(-0.5 * ((valor - mediaSus(k)) / desvioSus(k))^2);
+        pinicialLeg = pinicialLeg * pLegG;
+        pinicialSus = pinicialSus * pSusG;
     end
-
-    % Decisão final
-    if pinicialLeg > pinicialSus
-        Y_pred(j) = 'Legítimo';
-    else
-        Y_pred(j) = 'Suspeito';
-    end
+    if pinicialLeg > pinicialSus, Y_pred(j) = 'Legítimo'; else, Y_pred(j) = 'Suspeito'; end
 end
+close(h4);
 
-% Exibir resultados
 for j = 1:NJogadores
     fprintf('\nJogador %d (%s): %s\n', j, NovosJogadores{j, 1}, Y_pred(j));
 end

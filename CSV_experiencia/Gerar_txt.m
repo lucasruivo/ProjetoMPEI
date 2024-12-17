@@ -6,7 +6,7 @@ accuracy_limit = 80;
 reaction_limit = 200;
 apm_low = 40;
 apm_high = 100;
-headshot_limit = 70; % Limite para taxa de headshots considerada estranha (%)
+headshot_limit = 70; 
 
 % Pesos das métricas
 pesos = struct(...
