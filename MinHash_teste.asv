@@ -30,6 +30,7 @@ J = distanciasMinHash(MA,MA2,Nb,1,k);
 threshold = 0.35;
 SimilarUsers = paresSimilares(J,Nb,1,InvBots,test,threshold);
 if ~isempty(SimilarUsers)
+        susInv = 1;
         distancias = cell2mat(SimilarUsers(:, 9)); 
         dist = min(distancias);
         indiceBot = find(distancias == dist, 1);
