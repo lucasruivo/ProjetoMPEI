@@ -33,7 +33,7 @@ fprintf('Bloom Filter inicializado com %d bits.\n', n);
 fprintf('\n--- Iniciando MinHash ---\n');
 ksh = 3;
 [Set, Nb, InvBots] = criar_sets(ficheiro_inventarios, ksh);
-km = 200;
+km = 500;
 
 p = 123456781;
 

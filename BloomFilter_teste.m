@@ -23,10 +23,6 @@ for nj = 1:length(jogadores)
         BF = adicionarElemento(j,BF,k,R);
     end
 end
-%%
-
-%teste='192.168.200.30';
-%r= verificarElemento(teste,BF,k,R)
  
 %% TESTES DE FALSOS POSITIVOS(dados para o relatório)
 
@@ -49,3 +45,11 @@ OcupacaoBF = sum(BF) / n * 100;
 fprintf('Taxa de falsos positivos: %.2f%%\n', percentFalsosPositivos);
 fprintf('Ocupação do Bloom Filter: %.2f%%\n', OcupacaoBF);
 
+
+
+
+
+
+
+
+%% VER O ~ANY(ISTO), VER A WAITBAR, FAZER AS VERIFICAÇÕES
