@@ -55,8 +55,14 @@ NJogadores = input('Quantos jogadores quer verificar? ');
 
 for i = 1:NJogadores
     fprintf('\n*** Verificação para Jogador %d ***\n', i);
-
-    ip = input('IP (ex: 192.168.x.x): ', 's');    
+    while true
+        ip = input('IP (ex: 192.168.x.x): ', 's');
+        if verificarIP(ip)
+            break;
+        else
+            fprintf('IP inválido: 192.168.x.x com x entre 0 e 255.\n');
+        end
+    end
 
     JaFoiSuspeito = verificarElemento(ip, BF, kb, R);
     if JaFoiSuspeito == 1
@@ -165,4 +171,15 @@ close(h4);
 
 for j = 1:NJogadores
     fprintf('\nJogador %d (%s): %s\n', j, NovosJogadores{j, 1}, Y_pred(j));
+end
+
+function res = verificarIP(ip)
+partes = str2double(strsplit(ip,'.'));
+if length(partes) ~=4
+    res = false;
+for i=1:4
+    if sum(isnan(partes)>0)
+        
+
+    end
 end
