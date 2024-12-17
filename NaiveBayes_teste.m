@@ -101,7 +101,7 @@ for j = 1:size(TESTE,1)
     end
 end
 
-%% TESTES DE PRECISÃO, RECALL E F1-SCORE(dados pro relatório)
+%% TESTES DE PRECISÃO, RECALL E F1-SCORE(dados para o relatório)
 
 Matriz_conf = confusionmat(classes_teste, Y_pred);
 
@@ -110,12 +110,12 @@ FP = Matriz_conf(1, 2);
 FN = Matriz_conf(2, 1); 
 TN = Matriz_conf(1, 1); 
 
-precisao = TP / (TP + FP);
-recall = TP / (TP + FN);
+precisao = TP / (TP + FP) * 100;
+recall = TP / (TP + FN) * 100;
 f1_score = 2 * precisao * recall / (precisao + recall);
 
-fprintf('Precisão: %.2f%%\n', precisao * 100);
-fprintf('Recall: %.2f%%\n', recall * 100);
-fprintf('F1-Score: %.2f%%\n', f1_score * 100);
+fprintf('Precisão: %.2f%%\n', precisao);
+fprintf('Recall: %.2f%%\n', recall);
+fprintf('F1-Score: %.2f%%\n', f1_score);
 
 confusionchart(classes_teste, Y_pred);
